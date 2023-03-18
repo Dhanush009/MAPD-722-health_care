@@ -1,10 +1,59 @@
 import 'package:flutter/material.dart';
+import 'package:health_care/components/ViewRecord.dart';
 import 'package:health_care/components/addpatienttest.dart';
 import 'package:health_care/components/updatepatient.dart';
-import 'package:health_care/components/viewtest.dart';
+import 'package:health_care/model/patientdatamodel.dart';
+import '../model/getpatientdatamodel.dart';
+import '../model/updpatientdatamodel.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_hooks/flutter_hooks.dart';
 
-class ViewPatient extends StatelessWidget {
-  const ViewPatient({super.key});
+
+
+
+class ViewPatient extends StatefulWidget {
+  //const ViewPatient({super.key});
+  late String id;
+  ViewPatient({super.key, required this.id});
+
+  @override
+  State<ViewPatient> createState() => _ViewPatientState(id);
+}
+
+class _ViewPatientState extends State<ViewPatient>{
+
+  String id;
+  _ViewPatientState(this.id);
+
+  late GetData data = GetData(id: "1", firstname: "", lastname: "", gender: "", age: "", doctor: "", department: "", v: 0);
+
+  Future<GetPatientDataModel> getPatientData() async{ 
+    var response = await http.get(Uri.http('localhost:8080','/api/patient/$id'));
+
+    if(response.statusCode == 200){
+      
+      String responseString = response.body;
+      return getPatientDataModelFromJson(responseString);
+      
+    } 
+    else{
+      return getPatientDataModelFromJson(response.body);
+    }
+    
+  }
+
+  @override
+  void initState(){
+    super.initState();
+   
+    getPatientData().then((value) {
+      setState(() {
+        data = value.data;
+      });
+    });
+
+  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +76,9 @@ class ViewPatient extends StatelessWidget {
                   width: double.infinity,
                   margin: const EdgeInsets.fromLTRB(15, 90, 15, 8),
                   alignment:Alignment.center,
-                  child: const Text("Bruno's Details ",
+                  child: Text("${data!.firstname}'s Details ",
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white)),
                   
                 ),
@@ -40,7 +89,7 @@ class ViewPatient extends StatelessWidget {
                         width: 180,
                         height: 50,
                         child: ElevatedButton(
-                        onPressed:() => { Navigator.push(context, MaterialPageRoute(builder: (context) => const UpdatePatient())) },
+                        onPressed:() => { Navigator.push(context, MaterialPageRoute(builder: (context) => UpdatePatient(patient: data))) },
                         style: ElevatedButton.styleFrom(
                           textStyle: const TextStyle(fontSize: 18),
                           elevation: 3,
@@ -72,8 +121,8 @@ class ViewPatient extends StatelessWidget {
                   Container(
                     margin: const EdgeInsets.fromLTRB(2, 20, 15, 8),
                     alignment: Alignment.topLeft,
-                    child: const Text('Bruno Fernandes',
-                        style: TextStyle(
+                    child: Text("${data!.firstname} ${data!.lastname}",
+                        style: const TextStyle(
                             fontSize: 22,fontWeight:FontWeight.bold),
                           textAlign: TextAlign.left),
                   ),
@@ -93,8 +142,8 @@ class ViewPatient extends StatelessWidget {
                   Container(
                     margin: const EdgeInsets.fromLTRB(2, 20, 15, 8),
                     alignment: Alignment.topLeft,
-                    child: const Text('28',
-                        style: TextStyle(
+                    child: Text(data!.age,
+                        style: const TextStyle(
                             fontSize: 22,fontWeight:FontWeight.bold),
                           textAlign: TextAlign.left),
                   ),
@@ -114,34 +163,14 @@ class ViewPatient extends StatelessWidget {
                   Container(
                     margin: const EdgeInsets.fromLTRB(2, 8, 15, 8),
                     alignment: Alignment.topLeft,
-                    child: const Text('Male',
-                        style: TextStyle(
+                    child: Text(data!.gender,
+                        style: const TextStyle(
                             fontSize: 22,fontWeight:FontWeight.bold),
                           textAlign: TextAlign.left),
                   ),
 
                 ],),
 
-                Row(children: [
-                  Container(
-                    margin: const EdgeInsets.fromLTRB(15, 20, 15, 8),
-                    alignment: Alignment.topLeft,
-                    child: const Text('DOB:',
-                        style: TextStyle(
-                            fontSize: 22),
-                          textAlign: TextAlign.left),
-                  ),
-
-                  Container(
-                    margin: const EdgeInsets.fromLTRB(2, 20, 15, 8),
-                    alignment: Alignment.topLeft,
-                    child: const Text('1994/05/28',
-                        style: TextStyle(
-                            fontSize: 22,fontWeight:FontWeight.bold),
-                          textAlign: TextAlign.left),
-                  ),
-
-                ],),
 
                 Row(children: [
                   Container(
@@ -156,8 +185,8 @@ class ViewPatient extends StatelessWidget {
                   Container(
                     margin: const EdgeInsets.fromLTRB(2, 20, 15, 8),
                     alignment: Alignment.topLeft,
-                    child: const Text('Jose Sa',
-                        style: TextStyle(
+                    child: Text(data!.doctor,
+                        style: const TextStyle(
                             fontSize: 22,fontWeight:FontWeight.bold),
                           textAlign: TextAlign.left),
                   ),
@@ -196,7 +225,7 @@ class ViewPatient extends StatelessWidget {
                         width: 170,
                         height: 50,
                         child: ElevatedButton(
-                        onPressed:() => { Navigator.push(context, MaterialPageRoute(builder: (context) => const AddPatientTest())) },
+                        onPressed:() => { Navigator.push(context, MaterialPageRoute(builder: (context) => AddPatientTest(patient: data))) },
                         style: ElevatedButton.styleFrom(
                           textStyle: const TextStyle(fontSize: 18),
                           elevation: 3,
@@ -212,7 +241,7 @@ class ViewPatient extends StatelessWidget {
                         width: 180,
                         height: 50,
                         child: ElevatedButton(
-                        onPressed:() => { Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewTestRecord())) },
+                        onPressed:() => { Navigator.push(context, MaterialPageRoute(builder: (context) => ViewRecord(patient: data))) },
                         style: ElevatedButton.styleFrom(
                           textStyle: const TextStyle(fontSize: 18),
                           elevation: 3,
@@ -235,4 +264,7 @@ class ViewPatient extends StatelessWidget {
  
         ));
   }
+
 }
+
+  

@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animated_button/flutter_animated_button.dart';
 import 'package:http/http.dart' as http;
 import 'package:quickalert/quickalert.dart';
 import '../model/datamodel.dart';
+import 'package:flutter/services.dart';
 
 class AddPatient extends StatefulWidget {
   const AddPatient({super.key});
@@ -12,9 +15,12 @@ class AddPatient extends StatefulWidget {
 }
 
 class _AddPatientState extends State<AddPatient> {
-  bool res = false;
   DataModel? _dataModel;
+
+  late DataModel data;
+
   final formKey = GlobalKey<FormState>();
+
   TextEditingController _firstname = TextEditingController();
   TextEditingController _lastname = TextEditingController();
   TextEditingController _age = TextEditingController();
@@ -22,7 +28,7 @@ class _AddPatientState extends State<AddPatient> {
   TextEditingController _doc = TextEditingController();
   TextEditingController _dept = TextEditingController();
 
-  Future<DataModel> postData(String fname, String lname, String age, String gender, String doc, String dept) async{ 
+  Future<DataModel?> postData(String fname, String lname, String age, String gender, String doc, String dept) async{ 
     var response = await http.post(Uri.http('localhost:8080','/api/newpatient'), body: {
       "firstname":fname,
       "lastname": lname,
@@ -32,14 +38,16 @@ class _AddPatientState extends State<AddPatient> {
       "department": dept
     });
 
-    var data = response.body;
+
 
     if(response.statusCode == 200){
-      String responseString = data;
-      res = true;
-      return dataModelFromJson(responseString);
-    } else{
-      return dataModelFromJson(data);
+      
+      String responseString = response.body;
+      data = dataModelFromJson(responseString);
+      
+    } 
+    else{
+    return null;
     }
   }
 
@@ -54,7 +62,7 @@ class _AddPatientState extends State<AddPatient> {
 
   void showAlert() {
 
-    if(res == true){
+    if( data.success == true){
       QuickAlert.show(context: context, 
       text: 'Patient Added!!',
       type: QuickAlertType.success);
@@ -71,9 +79,7 @@ class _AddPatientState extends State<AddPatient> {
         appBar: AppBar(
           title: const Text('Add New Patient', style: TextStyle(color: Colors.white),),
           backgroundColor: const Color.fromARGB(255, 64, 95, 253),
-          automaticallyImplyLeading: true,
-          leading: IconButton (icon: Icon(Icons.arrow_back_ios_new),
-          onPressed: () => Navigator.pop(context),)
+          
         ),
         body: ListView(children: [
           Container(
@@ -102,7 +108,7 @@ class _AddPatientState extends State<AddPatient> {
                     ),
                     style: const TextStyle(fontSize: 18),
                     validator: (value) {
-                      if(value!.isEmpty || !RegExp(r'^[a-z][A-Z]+$').hasMatch(value!)){
+                      if(value!.isEmpty || !RegExp(r'^[a-z][A-Z]+$').hasMatch(value)){
                         return 'Enter valid name';
                       }
                       else{
@@ -130,8 +136,8 @@ class _AddPatientState extends State<AddPatient> {
                     ),
                     style: const TextStyle(fontSize: 18),
                     validator: (value) {
-                      if(value!.isEmpty || !RegExp(r'^[a-z][A-Z]+$').hasMatch(value!)){
-                        return 'Enter valid name';
+                      if(value!.isEmpty || !RegExp(r'^[0-9]+$').hasMatch(value)){
+                        return 'Enter correct value';
                       }
                       else{
                         return null;
@@ -159,7 +165,7 @@ class _AddPatientState extends State<AddPatient> {
                     ),
                     style: const TextStyle(fontSize: 18),
                     validator: (value) {
-                      if(value!.isEmpty || !RegExp(r'^[a-z][A-Z]+$').hasMatch(value!)){
+                      if(value!.isEmpty || !RegExp(r'^[0-9]+$').hasMatch(value)){
                         return 'Enter valid name';
                       }
                       else{
@@ -188,8 +194,8 @@ class _AddPatientState extends State<AddPatient> {
                     ),
                     style: const TextStyle(fontSize: 18),
                     validator: (value) {
-                      if(value!.isEmpty || !RegExp(r'^[a-z][A-Z]+$').hasMatch(value!)){
-                        return 'Enter valid name';
+                      if(value!.isEmpty || !RegExp(r'^[a-z][A-Z]+$').hasMatch(value)){
+                        return 'Select Gender';
                       }
                       else{
                         return null;
@@ -217,7 +223,7 @@ class _AddPatientState extends State<AddPatient> {
                     ),
                     style: const TextStyle(fontSize: 18),
                     validator: (value) {
-                      if(value!.isEmpty || !RegExp(r'^[a-z][A-Z]+$').hasMatch(value!)){
+                      if(value!.isEmpty || !RegExp(r'^[a-z][A-Z]+$').hasMatch(value)){
                         return 'Enter valid name';
                       }
                       else{
@@ -246,8 +252,8 @@ class _AddPatientState extends State<AddPatient> {
                     ),
                     style: const TextStyle(fontSize: 18),
                     validator: (value) {
-                      if(value!.isEmpty || !RegExp(r'^[a-z][A-Z]+$').hasMatch(value!)){
-                        return 'Enter valid name';
+                      if(value!.isEmpty || !RegExp(r'^[a-z][A-Z]+$').hasMatch(value)){
+                        return 'Select Department';
                       }
                       else{
                         return null;

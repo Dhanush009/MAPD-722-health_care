@@ -1,69 +1,76 @@
 // To parse this JSON data, do
 //
-//     final dataModel = dataModelFromJson(jsonString);
+//     final getPatientDataModel = getPatientDataModelFromJson(jsonString);
 
 import 'dart:convert';
 
-DataModel dataModelFromJson(String str) => DataModel.fromJson(json.decode(str));
+GetPatientDataModel getPatientDataModelFromJson(String str) => GetPatientDataModel.fromJson(json.decode(str));
 
-String dataModelToJson(DataModel data) => json.encode(data.toJson());
+String getPatientDataModelToJson(GetPatientDataModel data) => json.encode(data.toJson());
 
-class DataModel {
-    DataModel({
+class GetPatientDataModel {
+    GetPatientDataModel({
         required this.success,
         required this.data,
-        required this.message,
     });
 
     bool success;
-    Data data;
-    String message;
+    GetData data;
 
-    factory DataModel.fromJson(Map<String, dynamic> json) => DataModel(
+    factory GetPatientDataModel.fromJson(Map<String, dynamic> json) => GetPatientDataModel(
         success: json["success"],
-        data: Data.fromJson(json["data"]),
-        message: json["message"],
+        data: GetData.fromJson(json["data"]),
     );
 
     Map<String, dynamic> toJson() => {
         "success": success,
         "data": data.toJson(),
-        "message": message,
     };
 }
 
-class Data {
-    Data({
+class GetData {
+    GetData({
+        required this.id,
         required this.firstname,
         required this.lastname,
         required this.gender,
         required this.age,
         required this.doctor,
         required this.department,
+        
+        required this.v,
     });
 
+    String id;
     String firstname;
     String lastname;
     String gender;
     String age;
     String doctor;
     String department;
+    
+    int v;
 
-    factory Data.fromJson(Map<String, dynamic> json) => Data(
+    factory GetData.fromJson(Map<String, dynamic> json) => GetData(
+        id: json["_id"],
         firstname: json["firstname"],
         lastname: json["lastname"],
         gender: json["gender"],
         age: json["age"],
         doctor: json["doctor"],
         department: json["department"],
+        
+        v: json["__v"],
     );
 
     Map<String, dynamic> toJson() => {
+        "_id": id,
         "firstname": firstname,
         "lastname": lastname,
         "gender": gender,
         "age": age,
         "doctor": doctor,
         "department": department,
+        "__v": v,
     };
 }

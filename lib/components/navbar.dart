@@ -4,8 +4,8 @@ import 'package:health_care/components/doctors.dart';
 import 'package:health_care/components/home.dart';
 import 'package:health_care/components/addpatient.dart';
 import 'package:health_care/components/search.dart';
-
-
+import 'package:http/http.dart' as http;
+import '../model/patientdatamodel.dart';
 
 class NavBar extends StatefulWidget {
   const NavBar({super.key});
@@ -16,13 +16,16 @@ class NavBar extends StatefulWidget {
 
 class _NavBarState extends State<NavBar> {
 
+  late PatientDataModel? allPatienData;
+
   int _currentIndex = 0;
-  final List<Widget> _children = [
+  List<Widget> _children = [
     Home(),
     Search(),
     AddPatient(),
     Doctors()
   ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,19 +41,19 @@ class _NavBarState extends State<NavBar> {
             _currentIndex = index;
           });
         },
-        tabs:const [
-          GButton(icon: Icons.home,
+        tabs: [
+          const GButton(icon: Icons.home,
           text: 'Home',
           ),
           GButton(
             icon: Icons.search,
-            text: 'Search',
+            text: 'Search'
           ),
-          GButton(
+          const GButton(
             icon: Icons.add,
             text: 'Add',
             ),
-          GButton(
+          const GButton(
             icon: Icons.list,
             text: 'Doctors',
             )

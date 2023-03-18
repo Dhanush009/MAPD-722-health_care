@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:health_care/components/addpatient.dart';
+import 'package:health_care/components/navbar.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -99,6 +100,7 @@ class Home extends StatelessWidget {
               
           ],
         ),
+        
         ),
     );
   }

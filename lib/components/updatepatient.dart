@@ -1,15 +1,85 @@
 import 'package:flutter/material.dart';
+import 'package:health_care/model/getpatientdatamodel.dart';
+import '../model/patientdatamodel.dart';
+import '../model/updpatientdatamodel.dart';
+import 'package:http/http.dart' as http;
+import 'package:quickalert/quickalert.dart';
+
+
 
 class UpdatePatient extends StatefulWidget {
-  const UpdatePatient({super.key});
+  //const UpdatePatient({super.key});
+  late GetData patient;
+  UpdatePatient({super.key,required this.patient});
 
   @override
-  State<UpdatePatient> createState() => _UpdatePatientState();
+  State<UpdatePatient> createState() => _UpdatePatientState(patient);
 }
 
 class _UpdatePatientState extends State<UpdatePatient> {
 
+  GetData patient;
+  _UpdatePatientState(this.patient);
+
+  UptPatientDataModel? patientModel;
+  late UptPatientData uptPatient = UptPatientData(id: "", firstname: "", lastname: "", gender: "", age: "", doctor: "", department: "", v: 0);
+
   final formKey = GlobalKey<FormState>();
+
+  TextEditingController _age = TextEditingController();
+  TextEditingController _gender = TextEditingController();
+  TextEditingController _doc = TextEditingController();
+  TextEditingController _dept = TextEditingController();
+
+   Future<UptPatientDataModel?> uptPatientData( String age, String gender, String doc, String dept) async{ 
+    var response = await http.put(Uri.http('localhost:8080','/api/updatepatient/${patient.id}'), body: {
+      
+      "gender": gender,
+      "age": age,
+      "doctor": doc,
+      "department": dept
+    });
+
+    String responseString = response.body;
+
+    if(response.statusCode == 200){
+      
+       uptPatient = uptPatientDataModelFromJson(responseString).data;
+      
+    } 
+    else{
+      
+      return uptPatientDataModelFromJson(responseString);
+    }
+  }
+
+    void showAlert() {
+
+      if( uptPatient.firstname == patient.firstname){
+        QuickAlert.show(context: context, 
+        text: 'Patient Updated!!',
+        type: QuickAlertType.success);
+      }else{
+        QuickAlert.show(context: context, text:"Unable to update patient!!" ,type: QuickAlertType.error);
+      }
+    
+  }
+
+   void clearText() {
+    _age.clear();
+    _gender.clear();
+    _doc.clear();
+    _dept.clear();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _age = new TextEditingController(text: patient.age);
+    _gender = new TextEditingController(text: patient.gender);
+    _doc = new TextEditingController(text: patient.doctor);
+    _dept = new TextEditingController(text: patient.department);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +106,7 @@ class _UpdatePatientState extends State<UpdatePatient> {
                     margin: const EdgeInsets.fromLTRB(15, 18, 15, 8),
                     alignment: Alignment.topLeft,
                     child: TextFormField(
+                      controller: _age,
                       decoration: const InputDecoration(
                       border:OutlineInputBorder(),
                       labelText: 'Age',
@@ -63,6 +134,7 @@ class _UpdatePatientState extends State<UpdatePatient> {
                     margin: const EdgeInsets.fromLTRB(15, 18, 15, 8),
                     alignment: Alignment.topLeft,
                     child: TextFormField(
+                      controller: _gender,
                       decoration: const InputDecoration(
                       border:OutlineInputBorder(),
                       labelText: 'Gender',
@@ -91,6 +163,7 @@ class _UpdatePatientState extends State<UpdatePatient> {
                     margin: const EdgeInsets.fromLTRB(15, 18, 15, 8),
                     alignment: Alignment.topLeft,
                     child: TextFormField(
+                      controller: _doc,
                       decoration: const InputDecoration(
                       border:OutlineInputBorder(),
                       labelText: 'Doctor ',
@@ -119,6 +192,7 @@ class _UpdatePatientState extends State<UpdatePatient> {
                     margin: const EdgeInsets.fromLTRB(15, 18, 15, 8),
                     alignment: Alignment.topLeft,
                     child: TextFormField(
+                      controller: _dept,
                       decoration: const InputDecoration(
                       border:OutlineInputBorder(),
                       labelText: 'Department ',
@@ -153,7 +227,23 @@ class _UpdatePatientState extends State<UpdatePatient> {
                         width: 140,
                         height: 50,
                         child: ElevatedButton(
-                        onPressed:() => { 0 },
+                        onPressed:() async { 
+                          
+                          String age = _age.text.toString();
+                          String gender = _gender.text.toString();
+                          String doctor = _doc.text.toString();
+                          String department = _dept.text.toString();
+
+                          UptPatientDataModel? data = await uptPatientData( age, gender, doctor, department);
+
+                          setState(() {
+                            patientModel = data;
+                          });
+
+                          showAlert();
+                          clearText();
+
+                         },
                         style: ElevatedButton.styleFrom(
                           textStyle: const TextStyle(fontSize: 18),
                           elevation: 3,
@@ -169,7 +259,7 @@ class _UpdatePatientState extends State<UpdatePatient> {
                         width: 140,
                         height: 50,
                         child: ElevatedButton(
-                        onPressed:() => { 0 },
+                        onPressed:() => { clearText() },
                         style: ElevatedButton.styleFrom(
                           textStyle: const TextStyle(fontSize: 18),
                           elevation: 3,

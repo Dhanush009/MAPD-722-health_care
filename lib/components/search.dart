@@ -1,6 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:health_care/components/viewpatient.dart';
-import 'package:health_care/model/patient_model.dart';
+import 'package:health_care/model/patientdatamodel.dart';
+import 'package:http/http.dart' as http;
+
+ Future<PatientDataModel> getAllData() async{ 
+    var response = await http.get(Uri.http('localhost:8080','/api/all'));
+
+    if(response.statusCode == 200){
+      
+      String responseString = response.body;
+      return patientDataModelFromJson(responseString);
+      
+    } 
+    else{
+      return patientDataModelFromJson(response.body);
+    }
+    
+  }
 
 class Search extends StatefulWidget {
   const Search({super.key});
@@ -10,9 +26,25 @@ class Search extends StatefulWidget {
 }
 
 class _SearchState extends State<Search> {
-  String _imag = '';
 
-  static List<PatientModel> patients = [
+  static List<Datum> allPatientData = [];
+  String _imag = '';
+  List<Datum> display_list = [];
+
+  @override
+  void initState(){
+    super.initState();
+    getAllData().then((value) {
+      setState(() {
+        allPatientData = value.data;
+        display_list = List.from(allPatientData);
+      });
+
+    });
+
+  }
+
+  /*static List<PatientModel> patients = [
     PatientModel("Bruno Fernandez", "Cardiology", "Critical", "Male"),
     PatientModel("Antony Martial", "Neurology", "Safe", "Male"),
     PatientModel("Marcus Rashford", "Ortho", "Critical", "Male"),
@@ -25,9 +57,9 @@ class _SearchState extends State<Search> {
     PatientModel("Thea", "Cardiology", "Critical", "Female"),
     PatientModel("Alexander", "Neurology", "Safe", "Male"),
     PatientModel("Melissa", "Cardiology", "Safe", "Female")
-  ];
+  ];*/
 
-  List<PatientModel> display_list = List.from(patients);
+  //List<PatientModel> display_list = List.from(patients);
 
   String _setImage(String gend){
 
@@ -43,13 +75,14 @@ class _SearchState extends State<Search> {
   void updateList (String value) {
 
     setState(() {
-      display_list = patients.where( (ele) => ele.patient_name!.toLowerCase().contains(value.toLowerCase())).toList();
+      display_list = allPatientData.where( (ele) => ele.firstname.toLowerCase().contains(value.toLowerCase())).toList();
     });
 
   }
 
   @override
   Widget build(BuildContext context) {
+    
     return MaterialApp(
 
       home: Scaffold(
@@ -90,7 +123,7 @@ class _SearchState extends State<Search> {
               ),
 
               Expanded(
-                child: display_list.length == 0 ? Center( child: Text("No Result Found" , style: TextStyle(
+                child: display_list!.length == 0 ? Center( child: Text("No Result Found" , style: TextStyle(
                   color: Color.fromRGBO(0, 122, 122, 122),
                   fontSize: 22,
                   fontWeight: FontWeight.bold
@@ -99,14 +132,16 @@ class _SearchState extends State<Search> {
                   itemCount: display_list.length,
                   itemBuilder: (context,index) => ListTile(
                     onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewPatient() ));
+                      
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => ViewPatient(id: display_list[index].id) ));
                     },
                     contentPadding: EdgeInsets.fromLTRB(14,8,14,8),
-                    title: Text(display_list[index].patient_name!, 
+                    title: Text(display_list[index].firstname+" "+display_list[index].lastname, 
                     style: const TextStyle(fontWeight: FontWeight.bold),),
-                    subtitle: Text(display_list[index].patient_dept!,style: TextStyle(color: Color.fromARGB(179, 89, 89, 89)),),
-                    trailing: Icon(display_list[index].patient_cond! == "Critical" ? Icons.warning : Icons.circle,color:display_list[index].patient_cond == "Critical" ?  Colors.red : Colors.green),
-                    leading: Image.asset(_setImage(display_list[index].patient_gender!))
+                    subtitle: Text(display_list[index].department,style: TextStyle(color: Color.fromARGB(179, 89, 89, 89)),),
+                    //trailing: Icon(display_list![index].patient_cond! == "Critical" ? Icons.warning : Icons.circle,color:display_list![index].patient_cond == "Critical" ?  Colors.red : Colors.green),
+                    
+                    leading: Image.asset(_setImage(display_list[index].gender))
                     ),
                 )
                 )

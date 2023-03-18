@@ -1,11 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:health_care/components/updatetest.dart';
+import 'package:health_care/model/getpatientdatamodel.dart';
+import 'package:http/http.dart' as http;
+import '../model/patienttestrecordsdatamodel.dart';
 
-class ViewTestRecord extends StatelessWidget {
-  const ViewTestRecord({super.key});
+class ViewRecord extends StatefulWidget {
+  //const ViewRecord({super.key});
+  late GetData patient;
+  ViewRecord({super.key, required this.patient});
+
+
+  @override
+  State<ViewRecord> createState() => _ViewRecordState(patient);
+}
+
+class _ViewRecordState extends State<ViewRecord> {
+  GetData patient;
+  _ViewRecordState(this.patient);
+
+  late RecordData data = RecordData(id: "", patientId: "", bloodPressure: "", respiratoryRate: "", oxygenLevel: "", heartbeat: "", date: "", v: 0);
+
+
+   Future<PatientTestRecordsDataModel> getPatientTestData() async{ 
+    var response = await http.get(Uri.http('localhost:8080','/api/onetestrecord/${patient.id}'));
+
+    String responseString = response.body;
+
+    if(response.statusCode == 200){
+      return patientTestRecordsDataModelFromJson(responseString);
+      
+    } 
+    else{
+      return patientTestRecordsDataModelFromJson(responseString);
+    }
+    
+  }
+
+  @override
+  void initState(){
+    super.initState();
+    getPatientTestData().then((value){
+      setState(() {
+        data = value.data;
+      });
+    });
+    print(data);
+  }
+
 
   @override
   Widget build(BuildContext context) {
+    print("INBUILD");
     return MaterialApp(
       home: Scaffold(
         appBar:AppBar(
@@ -25,7 +70,7 @@ class ViewTestRecord extends StatelessWidget {
                   width: double.infinity,
                   margin: const EdgeInsets.fromLTRB(15, 90, 15, 8),
                   alignment:Alignment.center,
-                  child: const Text("Bruno's Test Details ",
+                  child: Text("${patient.firstname}'s Test Details ",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white)),
@@ -70,7 +115,7 @@ class ViewTestRecord extends StatelessWidget {
                   Container(
                     margin: const EdgeInsets.fromLTRB(2, 20, 15, 8),
                     alignment: Alignment.topLeft,
-                    child: const Text('120',
+                    child: Text(data.bloodPressure,
                         style: TextStyle(
                             fontSize: 22,fontWeight:FontWeight.bold),
                           textAlign: TextAlign.left),
@@ -91,7 +136,7 @@ class ViewTestRecord extends StatelessWidget {
                   Container(
                     margin: const EdgeInsets.fromLTRB(2, 20, 15, 8),
                     alignment: Alignment.topLeft,
-                    child: const Text('28',
+                    child: Text(data.respiratoryRate,
                         style: TextStyle(
                             fontSize: 22,fontWeight:FontWeight.bold),
                           textAlign: TextAlign.left),
@@ -112,7 +157,7 @@ class ViewTestRecord extends StatelessWidget {
                   Container(
                     margin: const EdgeInsets.fromLTRB(2, 20, 15, 8),
                     alignment: Alignment.topLeft,
-                    child: const Text('98',
+                    child: Text(data.oxygenLevel,
                         style: TextStyle(
                             fontSize: 22,fontWeight:FontWeight.bold),
                           textAlign: TextAlign.left),
@@ -133,7 +178,7 @@ class ViewTestRecord extends StatelessWidget {
                   Container(
                     margin: const EdgeInsets.fromLTRB(2, 20, 15, 8),
                     alignment: Alignment.topLeft,
-                    child: const Text('82',
+                    child: Text(data.heartbeat,
                         style: TextStyle(
                             fontSize: 22,fontWeight:FontWeight.bold),
                           textAlign: TextAlign.left),
@@ -154,7 +199,7 @@ class ViewTestRecord extends StatelessWidget {
                   Container(
                     margin: const EdgeInsets.fromLTRB(2, 20, 15, 8),
                     alignment: Alignment.topLeft,
-                    child: const Text('2023/03/01',
+                    child: Text(data.date,
                         style: TextStyle(
                             fontSize: 22,fontWeight:FontWeight.bold),
                           textAlign: TextAlign.left),
