@@ -44,22 +44,6 @@ class _SearchState extends State<Search> {
 
   }
 
-  /*static List<PatientModel> patients = [
-    PatientModel("Bruno Fernandez", "Cardiology", "Critical", "Male"),
-    PatientModel("Antony Martial", "Neurology", "Safe", "Male"),
-    PatientModel("Marcus Rashford", "Ortho", "Critical", "Male"),
-    PatientModel("Thea", "Cardiology", "Critical", "Female"),
-    PatientModel("Alexander", "Neurology", "Safe", "Male"),
-    PatientModel("Melissa", "Cardiology", "Safe", "Female"),
-    PatientModel("Bruno Fernandez", "Cardiology", "Critical", "Male"),
-    PatientModel("Antony Martial", "Neurology", "Safe", "Male"),
-    PatientModel("Marcus Rashford", "Ortho", "Critical", "Male"),
-    PatientModel("Thea", "Cardiology", "Critical", "Female"),
-    PatientModel("Alexander", "Neurology", "Safe", "Male"),
-    PatientModel("Melissa", "Cardiology", "Safe", "Female")
-  ];*/
-
-  //List<PatientModel> display_list = List.from(patients);
 
   String _setImage(String gend){
 

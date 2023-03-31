@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:health_care/components/prviousrecords.dart';
 import 'package:health_care/components/updatetest.dart';
 import 'package:health_care/model/getpatientdatamodel.dart';
 import 'package:http/http.dart' as http;
@@ -19,7 +20,7 @@ class _ViewRecordState extends State<ViewRecord> {
   _ViewRecordState(this.patient);
 
   late RecordData data = RecordData(id: "", patientId: "", bloodPressure: "", respiratoryRate: "", oxygenLevel: "", heartbeat: "", date: "", v: 0);
-
+  String bloodP="",resp="",oxy="",heart="";
 
    Future<PatientTestRecordsDataModel> getPatientTestData() async{ 
     var response = await http.get(Uri.http('localhost:8080','/api/onetestrecord/${patient.id}'));
@@ -36,15 +37,27 @@ class _ViewRecordState extends State<ViewRecord> {
     
   }
 
+  void updRecord(List data) {
+    setState(() {
+      bloodP = data[0];
+      resp = data[1];
+      oxy = data[2];
+      heart = data[3];
+    });
+  }
+
   @override
   void initState(){
     super.initState();
     getPatientTestData().then((value){
       setState(() {
         data = value.data;
+        bloodP = data!.bloodPressure;
+        resp = data!.respiratoryRate;
+        oxy = data!.oxygenLevel;
+        heart = data!.heartbeat;
       });
     });
-    print(data);
   }
 
 
@@ -83,7 +96,7 @@ class _ViewRecordState extends State<ViewRecord> {
                         width: 180,
                         height: 50,
                         child: ElevatedButton(
-                        onPressed:() => { 0 },
+                        onPressed:() => { Navigator.push(context, MaterialPageRoute(builder: (context) => PreviousRecords(id: patient.id,))) },
                         style: ElevatedButton.styleFrom(
                           textStyle: const TextStyle(fontSize: 18),
                           elevation: 3,
@@ -115,7 +128,7 @@ class _ViewRecordState extends State<ViewRecord> {
                   Container(
                     margin: const EdgeInsets.fromLTRB(2, 20, 15, 8),
                     alignment: Alignment.topLeft,
-                    child: Text(data.bloodPressure,
+                    child: Text(bloodP,
                         style: TextStyle(
                             fontSize: 22,fontWeight:FontWeight.bold),
                           textAlign: TextAlign.left),
@@ -136,7 +149,7 @@ class _ViewRecordState extends State<ViewRecord> {
                   Container(
                     margin: const EdgeInsets.fromLTRB(2, 20, 15, 8),
                     alignment: Alignment.topLeft,
-                    child: Text(data.respiratoryRate,
+                    child: Text(resp,
                         style: TextStyle(
                             fontSize: 22,fontWeight:FontWeight.bold),
                           textAlign: TextAlign.left),
@@ -157,7 +170,7 @@ class _ViewRecordState extends State<ViewRecord> {
                   Container(
                     margin: const EdgeInsets.fromLTRB(2, 20, 15, 8),
                     alignment: Alignment.topLeft,
-                    child: Text(data.oxygenLevel,
+                    child: Text(oxy,
                         style: TextStyle(
                             fontSize: 22,fontWeight:FontWeight.bold),
                           textAlign: TextAlign.left),
@@ -178,7 +191,7 @@ class _ViewRecordState extends State<ViewRecord> {
                   Container(
                     margin: const EdgeInsets.fromLTRB(2, 20, 15, 8),
                     alignment: Alignment.topLeft,
-                    child: Text(data.heartbeat,
+                    child: Text(heart,
                         style: TextStyle(
                             fontSize: 22,fontWeight:FontWeight.bold),
                           textAlign: TextAlign.left),
@@ -216,7 +229,7 @@ class _ViewRecordState extends State<ViewRecord> {
                         width: 180,
                         height: 50,
                         child: ElevatedButton(
-                        onPressed:() => { Navigator.push(context, MaterialPageRoute(builder: (context) => const UpdatePatientTest())) },
+                        onPressed:() => { Navigator.push(context, MaterialPageRoute(builder: (context) => UpdatePatientTest(testRecord: data, updateTestData: updRecord))) },
                         style: ElevatedButton.styleFrom(
                           textStyle: const TextStyle(fontSize: 18),
                           elevation: 3,

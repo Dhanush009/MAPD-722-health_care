@@ -1,15 +1,88 @@
 import 'package:flutter/material.dart';
+import 'package:health_care/model/patienttestrecordsdatamodel.dart';
+import 'package:health_care/model/updatetestdatamodel.dart';
+import 'package:http/http.dart' as http;
+import 'package:quickalert/quickalert.dart';
 
 class UpdatePatientTest extends StatefulWidget {
-  const UpdatePatientTest({super.key});
+  //const UpdatePatientTest({super.key});
+  late RecordData testRecord;
+  final Function updateTestData;
+  UpdatePatientTest({super.key,required this.testRecord, required this.updateTestData});
 
   @override
-  State<UpdatePatientTest> createState() => _UpdatePatientTestState();
+  State<UpdatePatientTest> createState() => _UpdatePatientTestState(testRecord,updateTestData);
 }
 
 class _UpdatePatientTestState extends State<UpdatePatientTest> {
 
+  RecordData testRecord;
+  final Function updTestCallback;
+  _UpdatePatientTestState(this.testRecord, this.updTestCallback);
+
+  UpdateTestRecordsDataModel? uptRecord;
+  late UptTestData uptTest = UptTestData(id: "", patientId: "", bloodPressure: "", respiratoryRate: "", oxygenLevel: "", heartbeat: "", date: "", v: 0);
+
+
+  Future <UpdateTestRecordsDataModel?> updtestData(String bloodP, String respRate, String oxygen, String heartbeat) async{
+      var response = await http.put(Uri.http('localhost:8080','/api/updatetest/${testRecord.id}'), body: {
+      
+        "bloodPressure": bloodP,
+        "respiratoryRate": respRate,
+        "oxygenLevel": oxygen,
+        "heartbeat": heartbeat
+      });
+      String responseString = response.body;
+
+      if(response.statusCode == 200){
+        
+        uptTest = updateTestRecordsDataModelFromJson(responseString).data;
+        
+      } 
+      else{
+        
+        return updateTestRecordsDataModelFromJson(responseString);
+      }
+  }
+
+    void showAlert() {
+
+      if( uptTest.bloodPressure == testRecord.bloodPressure){
+        QuickAlert.show(context: context, 
+        text: 'Record Updated!!',
+        type: QuickAlertType.success);
+      }else{
+        QuickAlert.show(context: context, text:"Unable to update record!!" ,type: QuickAlertType.error);
+      }
+    
+  }
+
   final formKey = GlobalKey<FormState>();
+
+  TextEditingController _bloodP = new TextEditingController();
+  TextEditingController _respRate = new TextEditingController();
+  TextEditingController _oxygen = new TextEditingController();
+  TextEditingController _heartbeat = new TextEditingController();
+
+
+
+  void clearText(){
+    _bloodP.clear();
+    _respRate.clear();
+    _oxygen.clear();
+    _heartbeat.clear();
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+    _bloodP = new TextEditingController(text: testRecord.bloodPressure);
+    _respRate = new TextEditingController(text: testRecord.respiratoryRate);
+    _oxygen = new TextEditingController(text: testRecord.oxygenLevel);
+    _heartbeat  = new TextEditingController(text: testRecord.heartbeat);
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +108,7 @@ class _UpdatePatientTestState extends State<UpdatePatientTest> {
                     margin: const EdgeInsets.fromLTRB(15, 18, 15, 8),
                     alignment: Alignment.topLeft,
                     child: TextFormField(
+                      controller: _bloodP,
                       decoration: const InputDecoration(
                       border:OutlineInputBorder(),
                       labelText: 'Blood Pressure ',
@@ -62,6 +136,7 @@ class _UpdatePatientTestState extends State<UpdatePatientTest> {
                     margin: const EdgeInsets.fromLTRB(15, 18, 15, 8),
                     alignment: Alignment.topLeft,
                     child: TextFormField(
+                      controller: _respRate,
                       decoration: const InputDecoration(
                       border:OutlineInputBorder(),
                       labelText: 'Respiratory Rate ',
@@ -90,6 +165,7 @@ class _UpdatePatientTestState extends State<UpdatePatientTest> {
                     margin: const EdgeInsets.fromLTRB(15, 18, 15, 8),
                     alignment: Alignment.topLeft,
                     child: TextFormField(
+                      controller: _oxygen,
                       decoration: const InputDecoration(
                       border:OutlineInputBorder(),
                       labelText: 'Blood Oxygen Level',
@@ -117,6 +193,7 @@ class _UpdatePatientTestState extends State<UpdatePatientTest> {
                     margin: const EdgeInsets.fromLTRB(15, 18, 15, 8),
                     alignment: Alignment.topLeft,
                     child: TextFormField(
+                      controller: _heartbeat,
                       decoration: const InputDecoration(
                       border:OutlineInputBorder(),
                       labelText: 'HeartBeat Rate',
@@ -151,7 +228,24 @@ class _UpdatePatientTestState extends State<UpdatePatientTest> {
                         width: 140,
                         height: 50,
                         child: ElevatedButton(
-                        onPressed:() => { 0 },
+                        onPressed:() async{
+                          String bloodP = _bloodP.text.toString();
+                          String resp = _respRate.text.toString();
+                          String oxygen = _oxygen.text.toString();
+                          String heart = _heartbeat.text.toString();
+
+                          updTestCallback([bloodP, resp, oxygen, heart]);
+
+                          UpdateTestRecordsDataModel? data = await updtestData(bloodP, resp, oxygen, heart);
+
+                          setState(() {
+                            uptRecord = data;
+                          });
+
+                          showAlert();
+                          clearText();
+
+                        },
                         style: ElevatedButton.styleFrom(
                           textStyle: const TextStyle(fontSize: 18),
                           elevation: 3,
@@ -167,7 +261,7 @@ class _UpdatePatientTestState extends State<UpdatePatientTest> {
                         width: 140,
                         height: 50,
                         child: ElevatedButton(
-                        onPressed:() => { 0 },
+                        onPressed:() => { clearText },
                         style: ElevatedButton.styleFrom(
                           textStyle: const TextStyle(fontSize: 18),
                           elevation: 3,

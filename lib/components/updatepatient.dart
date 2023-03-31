@@ -5,21 +5,24 @@ import '../model/updpatientdatamodel.dart';
 import 'package:http/http.dart' as http;
 import 'package:quickalert/quickalert.dart';
 
-
-
 class UpdatePatient extends StatefulWidget {
   //const UpdatePatient({super.key});
   late GetData patient;
-  UpdatePatient({super.key,required this.patient});
+  final Function updateCallback;
+  UpdatePatient({super.key,required this.patient, required this.updateCallback});
 
   @override
-  State<UpdatePatient> createState() => _UpdatePatientState(patient);
+  State<UpdatePatient> createState() => _UpdatePatientState(patient, updateCallback);
 }
 
 class _UpdatePatientState extends State<UpdatePatient> {
 
   GetData patient;
-  _UpdatePatientState(this.patient);
+  final Function updCallback;
+
+  _UpdatePatientState(this.patient, this.updCallback);
+  
+  
 
   UptPatientDataModel? patientModel;
   late UptPatientData uptPatient = UptPatientData(id: "", firstname: "", lastname: "", gender: "", age: "", doctor: "", department: "", v: 0);
@@ -233,6 +236,8 @@ class _UpdatePatientState extends State<UpdatePatient> {
                           String gender = _gender.text.toString();
                           String doctor = _doc.text.toString();
                           String department = _dept.text.toString();
+
+                          updCallback([age, gender, doctor, department]);
 
                           UptPatientDataModel? data = await uptPatientData( age, gender, doctor, department);
 

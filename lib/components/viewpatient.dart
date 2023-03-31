@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:health_care/components/ViewRecord.dart';
 import 'package:health_care/components/addpatienttest.dart';
@@ -23,7 +25,20 @@ class ViewPatient extends StatefulWidget {
 class _ViewPatientState extends State<ViewPatient>{
 
   String id;
+  String _age="", _gender="", _doctor="",_department="";
   _ViewPatientState(this.id);
+
+  void updateData(List data) {
+    setState(() {
+
+      _age = data[0];
+      _gender = data[1];
+      _doctor = data[2];
+      _department = data[3];
+      
+    });
+
+  }
 
   late GetData data = GetData(id: "1", firstname: "", lastname: "", gender: "", age: "", doctor: "", department: "", v: 0);
 
@@ -42,15 +57,26 @@ class _ViewPatientState extends State<ViewPatient>{
     
   }
 
+  void setData() {
+    getPatientData().then((value) {
+      setState(() {
+        data = value.data;
+        _age = data!.age;
+        _gender = data!.gender;
+        _doctor = data!.doctor;
+        _department = data!.department;
+      });
+    });
+  }
+
+  
+  
+
   @override
   void initState(){
     super.initState();
    
-    getPatientData().then((value) {
-      setState(() {
-        data = value.data;
-      });
-    });
+    setData();
 
   }
   
@@ -64,7 +90,10 @@ class _ViewPatientState extends State<ViewPatient>{
           backgroundColor: const Color.fromARGB(255, 64, 95, 253),
           automaticallyImplyLeading: true,
           leading: IconButton (icon: Icon(Icons.arrow_back_ios_new),
-          onPressed: () => Navigator.pop(context),)
+          onPressed: (){
+            //setData(); 
+            Navigator.pop(context);
+            },)
         ),
 
         body: ListView(children: [
@@ -89,7 +118,7 @@ class _ViewPatientState extends State<ViewPatient>{
                         width: 180,
                         height: 50,
                         child: ElevatedButton(
-                        onPressed:() => { Navigator.push(context, MaterialPageRoute(builder: (context) => UpdatePatient(patient: data))) },
+                        onPressed:() => { Navigator.push(context, MaterialPageRoute(builder: (context) => UpdatePatient(patient: data, updateCallback: updateData))) },
                         style: ElevatedButton.styleFrom(
                           textStyle: const TextStyle(fontSize: 18),
                           elevation: 3,
@@ -131,9 +160,11 @@ class _ViewPatientState extends State<ViewPatient>{
 
                 Row(children: [
                   Container(
+                  
                     margin: const EdgeInsets.fromLTRB(15, 20, 15, 8),
                     alignment: Alignment.topLeft,
                     child: const Text('Age:',
+                        
                         style: TextStyle(
                             fontSize: 22),
                           textAlign: TextAlign.left),
@@ -142,7 +173,7 @@ class _ViewPatientState extends State<ViewPatient>{
                   Container(
                     margin: const EdgeInsets.fromLTRB(2, 20, 15, 8),
                     alignment: Alignment.topLeft,
-                    child: Text(data!.age,
+                    child: Text(_age,
                         style: const TextStyle(
                             fontSize: 22,fontWeight:FontWeight.bold),
                           textAlign: TextAlign.left),
@@ -163,7 +194,7 @@ class _ViewPatientState extends State<ViewPatient>{
                   Container(
                     margin: const EdgeInsets.fromLTRB(2, 8, 15, 8),
                     alignment: Alignment.topLeft,
-                    child: Text(data!.gender,
+                    child: Text(_gender,
                         style: const TextStyle(
                             fontSize: 22,fontWeight:FontWeight.bold),
                           textAlign: TextAlign.left),
@@ -185,7 +216,7 @@ class _ViewPatientState extends State<ViewPatient>{
                   Container(
                     margin: const EdgeInsets.fromLTRB(2, 20, 15, 8),
                     alignment: Alignment.topLeft,
-                    child: Text(data!.doctor,
+                    child: Text(_doctor,
                         style: const TextStyle(
                             fontSize: 22,fontWeight:FontWeight.bold),
                           textAlign: TextAlign.left),
