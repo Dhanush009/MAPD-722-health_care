@@ -37,6 +37,7 @@ class Datum {
         required this.age,
         required this.doctor,
         required this.department,
+        required this.condition,
         required this.v,
     });
 
@@ -47,6 +48,7 @@ class Datum {
     String age;
     String doctor;
     String department;
+    String condition;
     int v;
 
     factory Datum.fromJson(Map<String, dynamic> json) => Datum(
@@ -57,6 +59,7 @@ class Datum {
         age: json["age"],
         doctor: json["doctor"],
         department: json["department"],
+        condition: json["condition"],
         v: json["__v"],
     );
 
@@ -68,6 +71,7 @@ class Datum {
         "age": age,
         "doctor": doctor,
         "department": department,
+        "condition": condition,
         "__v": v,
     };
 }

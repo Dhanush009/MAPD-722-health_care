@@ -40,6 +40,7 @@ class Data {
         required this.age,
         required this.doctor,
         required this.department,
+        required this.condition
     });
 
     String firstname;
@@ -48,6 +49,7 @@ class Data {
     String age;
     String doctor;
     String department;
+    String condition;
 
     factory Data.fromJson(Map<String, dynamic> json) => Data(
         firstname: json["firstname"],
@@ -56,6 +58,7 @@ class Data {
         age: json["age"],
         doctor: json["doctor"],
         department: json["department"],
+        condition: json["condition"]
     );
 
     Map<String, dynamic> toJson() => {
@@ -65,5 +68,6 @@ class Data {
         "age": age,
         "doctor": doctor,
         "department": department,
+        "condition": condition
     };
 }

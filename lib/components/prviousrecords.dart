@@ -17,7 +17,7 @@ class _PreviousRecordsState extends State<PreviousRecords> {
   //late String id;
 
   Future<PreviousRecordsDataModel> getAllRecords() async{
-    var response = await http.get(Uri.http('localhost:8080','/api/testrecord/${widget.id}'));
+    var response = await http.get(Uri.http('10.0.0.123:8090','/api/testrecord/${widget.id}'));
 
     String responseString = response.body;
 

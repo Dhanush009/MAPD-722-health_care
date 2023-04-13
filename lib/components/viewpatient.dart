@@ -25,7 +25,7 @@ class ViewPatient extends StatefulWidget {
 class _ViewPatientState extends State<ViewPatient>{
 
   String id;
-  String _age="", _gender="", _doctor="",_department="";
+  String _age="", _gender="", _doctor="",_department="",_condition="";
   _ViewPatientState(this.id);
 
   void updateData(List data) {
@@ -40,10 +40,43 @@ class _ViewPatientState extends State<ViewPatient>{
 
   }
 
-  late GetData data = GetData(id: "1", firstname: "", lastname: "", gender: "", age: "", doctor: "", department: "", v: 0);
+  Future<UptPatientDataModel?> uptPatientData( String cond) async{ 
+    var response = await http.put(Uri.http('10.0.0.123:8090','/api/updatepatient/$id'), body: {
+      "firstname":data.firstname,
+      "lastname": data.lastname,
+      "gender": data.gender,
+      "age": data.age,
+      "doctor": data.doctor,
+      "department": data.department,
+      "condition": _condition
+    });
+
+    String responseString = response.body;
+
+    if(response.statusCode == 200){
+      
+        return uptPatientDataModelFromJson(responseString);
+      
+    } 
+    else{
+      
+      return uptPatientDataModelFromJson(responseString);
+    }
+  }
+
+  void updateCondition(String cond) {
+    setState(() {
+
+      _condition = cond;
+      uptPatientData(_condition);
+      
+    },);
+  }
+
+  late GetData data = GetData(id: "1", firstname: "", lastname: "", gender: "", age: "", doctor: "", department: "", condition:"",v: 0);
 
   Future<GetPatientDataModel> getPatientData() async{ 
-    var response = await http.get(Uri.http('localhost:8080','/api/patient/$id'));
+    var response = await http.get(Uri.http('10.0.0.123:8090','/api/patient/$id'));
 
     if(response.statusCode == 200){
       
@@ -65,10 +98,19 @@ class _ViewPatientState extends State<ViewPatient>{
         _gender = data!.gender;
         _doctor = data!.doctor;
         _department = data!.department;
+        _condition = data!.condition;
       });
     });
   }
 
+
+  void getRecCond(String cond){
+    setState(() {
+      _condition = cond;
+      uptPatientData(_condition);
+
+    });
+  }
   
   
 
@@ -98,7 +140,7 @@ class _ViewPatientState extends State<ViewPatient>{
 
         body: ListView(children: [
           Container(
-            color: const Color.fromARGB(255, 64, 95, 253),
+            color: (_condition == "Critical") ? Color.fromARGB(255, 254, 90, 78) : Color.fromARGB(255, 64, 95, 253),
             height: 250,
             child: Column(children: [
               Container(
@@ -237,7 +279,7 @@ class _ViewPatientState extends State<ViewPatient>{
                   Container(
                     margin: const EdgeInsets.fromLTRB(2, 20, 15, 8),
                     alignment: Alignment.topLeft,
-                    child: const Text('Critical',
+                    child: Text(_condition,
                         style: TextStyle(
                             fontSize: 22,fontWeight:FontWeight.bold),
                           textAlign: TextAlign.left),
@@ -256,7 +298,7 @@ class _ViewPatientState extends State<ViewPatient>{
                         width: 170,
                         height: 50,
                         child: ElevatedButton(
-                        onPressed:() => { Navigator.push(context, MaterialPageRoute(builder: (context) => AddPatientTest(patient: data))) },
+                        onPressed:() => { Navigator.push(context, MaterialPageRoute(builder: (context) => AddPatientTest(patient: data, updateCondition: updateCondition,))) },
                         style: ElevatedButton.styleFrom(
                           textStyle: const TextStyle(fontSize: 18),
                           elevation: 3,
@@ -272,7 +314,7 @@ class _ViewPatientState extends State<ViewPatient>{
                         width: 180,
                         height: 50,
                         child: ElevatedButton(
-                        onPressed:() => { Navigator.push(context, MaterialPageRoute(builder: (context) => ViewRecord(patient: data))) },
+                        onPressed:() => { Navigator.push(context, MaterialPageRoute(builder: (context) => ViewRecord(patient: data, condition: _condition, upCond: getRecCond,))) },
                         style: ElevatedButton.styleFrom(
                           textStyle: const TextStyle(fontSize: 18),
                           elevation: 3,

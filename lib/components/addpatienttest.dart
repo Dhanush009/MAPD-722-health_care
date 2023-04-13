@@ -5,19 +5,23 @@ import 'package:http/http.dart' as http;
 import '../model/patienttestmodel.dart';
 import 'package:quickalert/quickalert.dart';
 
+import '../model/updpatientdatamodel.dart';
+
 class AddPatientTest extends StatefulWidget {
   //const AddPatientTest({super.key});
   late GetData patient;
-  AddPatientTest({super.key, required this.patient});
+  final Function updateCondition;
+  AddPatientTest({super.key, required this.patient, required this.updateCondition});
 
   @override
-  State<AddPatientTest> createState() => _AddPatientTestState(patient);
+  State<AddPatientTest> createState() => _AddPatientTestState(patient, updateCondition);
 }
 
 class _AddPatientTestState extends State<AddPatientTest> {
 
   GetData patient;
-  _AddPatientTestState(this.patient);
+  final Function updCond;
+  _AddPatientTestState(this.patient, this.updCond);
 
 
   PatientTestDataModel? patientTestModel;
@@ -33,7 +37,7 @@ class _AddPatientTestState extends State<AddPatientTest> {
   TextEditingController _heartbeat = TextEditingController();
 
   Future<PatientTestDataModel?> postTestData(String bloodP, String resp, String oxygen, String heartbeat, String date) async{ 
-    var response = await http.post(Uri.http('localhost:8080','/api/newrecord/${patient.id}'), body: {
+    var response = await http.post(Uri.http('10.0.0.123:8090','/api/newrecord/${patient.id}'), body: {
       "patientId": patient.id,
       "bloodPressure": bloodP,
       "respiratoryRate": resp,
@@ -259,6 +263,17 @@ class _AddPatientTestState extends State<AddPatientTest> {
                           String oxygen = _oxygen.text.toString();
                           String heartbeat = _heartbeat.text.toString();
                           String date = _date.text.toString();
+                         
+
+                          if(int.parse(bloodP) > 140 || int.parse(resp) <= 12 || int.parse(resp) >= 26 || int.parse(oxygen) < 88 || int.parse(heartbeat) > 100 || int.parse(heartbeat) <= 60 ){
+                            
+                            updCond("Critical");
+                           
+                          }else{
+                            
+                            updCond("Normal");
+                            
+                          }
 
                           PatientTestDataModel? data = await postTestData(bloodP, resp, oxygen, heartbeat, date);
 

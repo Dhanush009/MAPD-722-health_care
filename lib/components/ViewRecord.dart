@@ -8,22 +8,26 @@ import '../model/patienttestrecordsdatamodel.dart';
 class ViewRecord extends StatefulWidget {
   //const ViewRecord({super.key});
   late GetData patient;
-  ViewRecord({super.key, required this.patient});
+  final String condition;
+  final Function upCond;
+  ViewRecord({super.key, required this.patient, required this.condition, required this.upCond});
 
 
   @override
-  State<ViewRecord> createState() => _ViewRecordState(patient);
+  State<ViewRecord> createState() => _ViewRecordState(patient, condition, upCond);
 }
 
 class _ViewRecordState extends State<ViewRecord> {
   GetData patient;
-  _ViewRecordState(this.patient);
+  String condition;
+  final Function uptCon;
+  _ViewRecordState(this.patient, this .condition, this.uptCon);
 
   late RecordData data = RecordData(id: "", patientId: "", bloodPressure: "", respiratoryRate: "", oxygenLevel: "", heartbeat: "", date: "", v: 0);
   String bloodP="",resp="",oxy="",heart="";
 
    Future<PatientTestRecordsDataModel> getPatientTestData() async{ 
-    var response = await http.get(Uri.http('localhost:8080','/api/onetestrecord/${patient.id}'));
+    var response = await http.get(Uri.http('10.0.0.123:8090','/api/onetestrecord/${patient.id}'));
 
     String responseString = response.body;
 
@@ -34,6 +38,14 @@ class _ViewRecordState extends State<ViewRecord> {
     else{
       return patientTestRecordsDataModelFromJson(responseString);
     }
+    
+  }
+
+  void condUpt(String cond){
+    setState(() {
+      condition = cond;
+      uptCon(condition);
+    });
     
   }
 
@@ -76,7 +88,7 @@ class _ViewRecordState extends State<ViewRecord> {
 
         body: ListView(children: [
           Container(
-            color: const Color.fromARGB(255, 64, 95, 253),
+            color: (condition == "Critical") ? Color.fromARGB(255, 254, 90, 78) : Color.fromARGB(255, 64, 95, 253),
             height: 250,
             child: Column(children: [
               Container(
@@ -229,7 +241,7 @@ class _ViewRecordState extends State<ViewRecord> {
                         width: 180,
                         height: 50,
                         child: ElevatedButton(
-                        onPressed:() => { Navigator.push(context, MaterialPageRoute(builder: (context) => UpdatePatientTest(testRecord: data, updateTestData: updRecord))) },
+                        onPressed:() => { Navigator.push(context, MaterialPageRoute(builder: (context) => UpdatePatientTest(testRecord: data, updateTestData: updRecord, uptCond: condUpt,))) },
                         style: ElevatedButton.styleFrom(
                           textStyle: const TextStyle(fontSize: 18),
                           elevation: 3,

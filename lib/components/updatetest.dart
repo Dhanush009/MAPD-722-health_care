@@ -8,24 +8,26 @@ class UpdatePatientTest extends StatefulWidget {
   //const UpdatePatientTest({super.key});
   late RecordData testRecord;
   final Function updateTestData;
-  UpdatePatientTest({super.key,required this.testRecord, required this.updateTestData});
+  final Function uptCond;
+  UpdatePatientTest({super.key,required this.testRecord, required this.updateTestData, required this.uptCond});
 
   @override
-  State<UpdatePatientTest> createState() => _UpdatePatientTestState(testRecord,updateTestData);
+  State<UpdatePatientTest> createState() => _UpdatePatientTestState(testRecord,updateTestData, uptCond);
 }
 
 class _UpdatePatientTestState extends State<UpdatePatientTest> {
 
   RecordData testRecord;
   final Function updTestCallback;
-  _UpdatePatientTestState(this.testRecord, this.updTestCallback);
+  final Function upCond;
+  _UpdatePatientTestState(this.testRecord, this.updTestCallback, this.upCond);
 
   UpdateTestRecordsDataModel? uptRecord;
   late UptTestData uptTest = UptTestData(id: "", patientId: "", bloodPressure: "", respiratoryRate: "", oxygenLevel: "", heartbeat: "", date: "", v: 0);
 
 
   Future <UpdateTestRecordsDataModel?> updtestData(String bloodP, String respRate, String oxygen, String heartbeat) async{
-      var response = await http.put(Uri.http('localhost:8080','/api/updatetest/${testRecord.id}'), body: {
+      var response = await http.put(Uri.http('10.0.0.123:8090','/api/updatetest/${testRecord.id}'), body: {
       
         "bloodPressure": bloodP,
         "respiratoryRate": respRate,
@@ -237,6 +239,14 @@ class _UpdatePatientTestState extends State<UpdatePatientTest> {
                           updTestCallback([bloodP, resp, oxygen, heart]);
 
                           UpdateTestRecordsDataModel? data = await updtestData(bloodP, resp, oxygen, heart);
+
+                          if(int.parse(bloodP) > 140 || int.parse(resp) <= 12 || int.parse(resp) >= 26 || int.parse(oxygen) < 88 || int.parse(heart) > 100 || int.parse(heart) <= 60 ){
+                            
+                            upCond("Critical");
+                          }else{
+                            
+                            upCond("Normal");
+                          }
 
                           setState(() {
                             uptRecord = data;

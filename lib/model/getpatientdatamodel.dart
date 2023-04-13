@@ -37,7 +37,7 @@ class GetData {
         required this.age,
         required this.doctor,
         required this.department,
-        
+        required this.condition,
         required this.v,
     });
 
@@ -48,6 +48,7 @@ class GetData {
     String age;
     String doctor;
     String department;
+    String condition;
     
     int v;
 
@@ -59,6 +60,7 @@ class GetData {
         age: json["age"],
         doctor: json["doctor"],
         department: json["department"],
+        condition: json["condition"],
         
         v: json["__v"],
     );
@@ -71,6 +73,7 @@ class GetData {
         "age": age,
         "doctor": doctor,
         "department": department,
+        "condition": condition,
         "__v": v,
     };
 }

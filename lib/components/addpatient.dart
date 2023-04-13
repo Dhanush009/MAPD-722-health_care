@@ -29,13 +29,14 @@ class _AddPatientState extends State<AddPatient> {
   TextEditingController _dept = TextEditingController();
 
   Future<DataModel?> postData(String fname, String lname, String age, String gender, String doc, String dept) async{ 
-    var response = await http.post(Uri.http('localhost:8080','/api/newpatient'), body: {
+    var response = await http.post(Uri.http('10.0.0.123:8090','/api/newpatient'), body: {
       "firstname":fname,
       "lastname": lname,
       "gender": gender,
       "age": age,
       "doctor": doc,
-      "department": dept
+      "department": dept,
+      "condition": "Normal"
     });
 
 

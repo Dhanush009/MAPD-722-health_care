@@ -41,6 +41,7 @@ class UptPatientData {
         required this.age,
         required this.doctor,
         required this.department,
+        required this.condition,
         required this.v,
     });
 
@@ -51,6 +52,7 @@ class UptPatientData {
     String age;
     String doctor;
     String department;
+    String condition;
     int v;
 
     factory UptPatientData.fromJson(Map<String, dynamic> json) => UptPatientData(
@@ -61,6 +63,7 @@ class UptPatientData {
         age: json["age"],
         doctor: json["doctor"],
         department: json["department"],
+        condition: json["condition"],
         v: json["__v"],
     );
 
@@ -72,6 +75,7 @@ class UptPatientData {
         "age": age,
         "doctor": doctor,
         "department": department,
+        "condition": condition,
         "__v": v,
     };
 }

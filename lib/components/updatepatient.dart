@@ -25,7 +25,7 @@ class _UpdatePatientState extends State<UpdatePatient> {
   
 
   UptPatientDataModel? patientModel;
-  late UptPatientData uptPatient = UptPatientData(id: "", firstname: "", lastname: "", gender: "", age: "", doctor: "", department: "", v: 0);
+  late UptPatientData uptPatient = UptPatientData(id: "", firstname: "", lastname: "", gender: "", age: "", doctor: "", department: "",condition: "", v: 0);
 
   final formKey = GlobalKey<FormState>();
 
@@ -34,13 +34,21 @@ class _UpdatePatientState extends State<UpdatePatient> {
   TextEditingController _doc = TextEditingController();
   TextEditingController _dept = TextEditingController();
 
+  String getCond(){
+    String cond = patient.condition;
+    
+    return cond;
+  }
+
    Future<UptPatientDataModel?> uptPatientData( String age, String gender, String doc, String dept) async{ 
-    var response = await http.put(Uri.http('localhost:8080','/api/updatepatient/${patient.id}'), body: {
-      
+    var response = await http.put(Uri.http('10.0.0.123:8090','/api/updatepatient/${patient.id}'), body: {
+      "firstname":patient.firstname,
+      "lastname": patient.lastname,
       "gender": gender,
       "age": age,
       "doctor": doc,
-      "department": dept
+      "department": dept,
+      "condition": getCond()
     });
 
     String responseString = response.body;

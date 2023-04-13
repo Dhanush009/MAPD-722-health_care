@@ -4,7 +4,7 @@ import 'package:health_care/model/patientdatamodel.dart';
 import 'package:http/http.dart' as http;
 
  Future<PatientDataModel> getAllData() async{ 
-    var response = await http.get(Uri.http('localhost:8080','/api/all'));
+    var response = await http.get(Uri.http('10.0.0.123:8090','/api/all'));
 
     if(response.statusCode == 200){
       
@@ -123,7 +123,7 @@ class _SearchState extends State<Search> {
                     title: Text(display_list[index].firstname+" "+display_list[index].lastname, 
                     style: const TextStyle(fontWeight: FontWeight.bold),),
                     subtitle: Text(display_list[index].department,style: TextStyle(color: Color.fromARGB(179, 89, 89, 89)),),
-                    //trailing: Icon(display_list![index].patient_cond! == "Critical" ? Icons.warning : Icons.circle,color:display_list![index].patient_cond == "Critical" ?  Colors.red : Colors.green),
+                    //trailing: Icon(display_list![index].condition == "Critical" ? Icons.warning : Icons.circle,color:display_list![index].condition == "Critical" ?  Colors.red : Color.fromARGB(255, 64, 115, 243)),
                     
                     leading: Image.asset(_setImage(display_list[index].gender))
                     ),
